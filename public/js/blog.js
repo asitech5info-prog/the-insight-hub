@@ -123,9 +123,7 @@ async function loadBlog() {
         contentHtml += '<img src="' + blog.images[idx] + '" class="blog-inline-img" alt="Image ' + (idx + 1) + '">';
       }
     } else if (part.trim()) {
-      const paragraphs = part.split(/
-\s*
-/).filter(p => p.trim());
+      const paragraphs = part.split(/\n\s*\n/).filter(p => p.trim());
       paragraphs.forEach(p => {
         const parsed = parseMarkdown(p.trim());
         if (!parsed.startsWith('<h') && !parsed.startsWith('<ul')) {
