@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - The Insight Hub</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="admin-page">
+
+  <!-- LOGIN SCREEN -->
+  <div class="admin-login" id="loginBox">
+    <h2>🔒 Admin Login</h2>
+    <p>Enter your password to access the dashboard</p>
+    <input type="password" id="adminPass" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <p class="login-error" id="loginError"></p>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div class="admin-panel hidden" id="adminBox">
+
+    <!-- Header -->
+    <div class="admin-header">
+      <h1>📊 Admin Dashboard</h1>
+      <div class="admin-actions">
+        <button class="admin-btn primary" onclick="showTab('create')">
+          <span>+</span> New Blog
+        </button>
+        <button class="admin-btn secondary" onclick="showTab('messages')">
+          <span>✉</span> Messages
+        </button>
+        <button class="admin-btn danger" onclick="logout()">
+          <span>→</span> Logout
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon blue">📰</div>
+        <div class="stat-info">
+          <h3 id="statBlogs">0</h3>
+          <p>Total Blogs</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green">💬</div>
+        <div class="stat-info">
+          <h3 id="statReviews">0</h3>
+          <p>Total Reviews</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon orange">✉</div>
+        <div class="stat-info">
+          <h3 id="statMessages">0</h3>
+          <p>Total Messages</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon purple">🔔</div>
+        <div class="stat-info">
+          <h3 id="statUnread">0</h3>
+          <p>Unread Messages</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('blogs')" id="tab-blogs">📰 All Blogs</button>
+      <button class="tab-btn" onclick="showTab('create')" id="tab-create">✏️ Create Blog</button>
+      <button class="tab-btn" onclick="showTab('reviews')" id="tab-reviews">💬 Reviews</button>
+      <button class="tab-btn" onclick="showTab('messages')" id="tab-messages">✉ Messages</button>
+    </div>
+
+    <!-- TAB: All Blogs -->
+    <div class="tab-content active" id="content-blogs">
+      <div class="admin-section">
+        <h2>📰 All Blogs</h2>
+        <div id="blogsTableContainer">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Views</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="blogsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Create Blog -->
+    <div class="tab-content" id="content-create">
+      <div class="admin-section">
+        <h2>✏️ Create New Blog</h2>
+        <form class="blog-form" id="blogForm" enctype="multipart/form-data">
+          <input type="text" name="title" placeholder="Blog Title" required>
+
+          <select name="category" required>
+            <option value="">Select Category</option>
+            <option value="education">Education</option>
+            <option value="technology">Technology</option>
+            <option value="artificial intelligence">Artificial Intelligence</option>
+            <option value="science">Science</option>
+            <option value="movies">Movies</option>
+          </select>
+
+          <p class="file-hint">📷 Title Image (shown at top of blog):</p>
+          <input type="file" name="titleImage" accept="image/*" required>
+
+          <p class="file-hint">📝 Content: Type paragraphs. Insert images with <strong>[IMAGE:0]</strong>, <strong>[IMAGE:1]</strong>, etc.</p>
+          <textarea name="content" placeholder="Write your blog here...
+
+Example:
+This is paragraph one.
+
+[IMAGE:0]
+
+This is paragraph two with more text.
+
+[IMAGE:1]
+
+This is the final paragraph." required></textarea>
+
+          <p class="file-hint">📸 Upload Content Images (up to 5). [IMAGE:0] = first image:</p>
+          <input type="file" name="images" accept="image/*" multiple>
+
+          <button type="submit" class="admin-btn primary" style="width:auto">🚀 Publish Blog</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- TAB: Reviews -->
+    <div class="tab-content" id="content-reviews">
+      <div class="admin-section">
+        <h2>💬 All Reviews</h2>
+        <div id="reviewsTableContainer">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Blog</th>
+                <th>Rating</th>
+                <th>Comment</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="reviewsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Messages -->
+    <div class="tab-content" id="content-messages">
+      <div class="admin-section">
+        <h2>✉ All Messages</h2>
+        <div id="messagesTableContainer">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Subject</th>
+                <th>Message</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="messagesTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/js/admin.js"></script>
+</body>
+</html>
