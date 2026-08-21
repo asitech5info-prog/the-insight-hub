@@ -8,7 +8,7 @@ const app = express();
 // Middleware
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // MongoDB Connection
 const uri = process.env.MONGODB_URI || 'mongodb+srv://username:password@cluster.mongodb.net/insighthub?retryWrites=true&w=majority';
@@ -19,7 +19,7 @@ async function connectDB() {
   const client = new MongoClient(uri);
   await client.connect();
   db = client.db('insighthub');
-  console.log('✅ Connected to MongoDB Atlas');
+  console.log('Connected to MongoDB Atlas');
   return db;
 }
 
@@ -90,7 +90,6 @@ app.delete('/api/admin/blog/:id', async (req, res) => {
   try {
     const collection = await col('blogs');
     await collection.deleteOne({ id: req.params.id });
-    // Also delete related reviews
     const reviewsCol = await col('reviews');
     await reviewsCol.deleteMany({ blogId: req.params.id });
     res.json({ success: true });
@@ -233,6 +232,6 @@ module.exports = app;
 if (require.main === module) {
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {
-    console.log('🚀 The Insight Hub running at http://localhost:' + PORT);
+    console.log('The Insight Hub running at http://localhost:' + PORT);
   });
 }
