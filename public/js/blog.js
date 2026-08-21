@@ -81,23 +81,40 @@ function initCharCounter() {
   });
 }
 
-// Markdown parser
+// ===== MARKDOWN PARSER =====
+// Supports: # Heading, ## Sub Heading, **bold**, *italic*, - bullet, * bullet, 1. numbered
 function parseMarkdown(text) {
+  // Escape HTML first
   let html = text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/^## (.+)$/gm, '<h3 style="color:#a78bfa;font-size:1.4rem;margin:1.5rem 0 1rem;">$1</h3>')
-    .replace(/^# (.+)$/gm, '<h2 style="color:#ddd6fe;font-size:1.8rem;margin:2rem 0 1rem;font-weight:700;">$1</h2>')
-    .replace(/^- (.+)$/gm, '<li style="margin-bottom:0.5rem;color:#d1d5db;">$1</li>')
-    .replace(/^\* (.+)$/gm, '<li style="margin-bottom:0.5rem;color:#d1d5db;">$1</li>')
-    .replace(/^\d+\. (.+)$/gm, '<li style="margin-bottom:0.5rem;color:#d1d5db;">$1</li>')
-    .replace(/\n/g, '<br>');
+    .replace(/>/g, '&gt;');
 
-  html = html.replace(/(<li[^>]*>.*?<\/li>)(<br>)*\s*(<li[^>]*>.*?<\/li>)/gs, '$1$3');
-  html = html.replace(/(<li[^>]*>.*?<\/li>)+/gs, '<ul style="margin:1rem 0 1rem 1.5rem;list-style-type:disc;">$&</ul>');
+  // Headings (must be at start of line)
+  html = html.replace(/^# (.+)$/gm, '<h2 style="color:#ddd6fe;font-size:1.8rem;margin:2rem 0 1rem;font-weight:700;">$1</h2>');
+  html = html.replace(/^## (.+)$/gm, '<h3 style="color:#a78bfa;font-size:1.4rem;margin:1.5rem 0 1rem;">$1</h3>');
+
+  // Bold **text**
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+  // Italic *text* (but not bullet points)
+  // We handle this carefully - only match *text* that is NOT at start of line followed by space
+  html = html.replace(/(?<!^\s*)\*(?!\s)(.+?)(?<!\s)\*(?!\s)/g, '<em>$1</em>');
+
+  // Bullet points: - item  or  * item
+  html = html.replace(/^- (.+)$/gm, '<li style="margin-bottom:0.5rem;color:#d1d5db;">$1</li>');
+  html = html.replace(/^\* (.+)$/gm, '<li style="margin-bottom:0.5rem;color:#d1d5db;">$1</li>');
+
+  // Numbered lists
+  html = html.replace(/^\d+\. (.+)$/gm, '<li style="margin-bottom:0.5rem;color:#d1d5db;">$1</li>');
+
+  // Wrap consecutive li elements in ul
+  html = html.replace(/(<li[^>]*>.*?<\/li>\n?)+/gs, function(match) {
+    return '<ul style="margin:1rem 0 1rem 1.5rem;list-style-type:disc;">' + match.replace(/\n/g, '') + '</ul>';
+  });
+
+  // Line breaks for remaining text
+  html = html.replace(/\n/g, '<br>');
 
   return html;
 }
@@ -105,75 +122,91 @@ function parseMarkdown(text) {
 async function loadBlog() {
   if (!blogId) return location.href = '/';
 
+  // Track view (fire and forget)
   fetch('/api/blog/view/' + blogId, { method: 'POST' }).catch(()=>{});
 
-  const res = await fetch('/api/blog/' + blogId);
-  if (!res.ok) return location.href = '/';
+  try {
+    const res = await fetch('/api/blog/' + blogId);
+    if (!res.ok) return location.href = '/';
 
-  const blog = await res.json();
+    const blog = await res.json();
 
-  let contentHtml = '';
-  const parts = blog.content.split(/(\[IMAGE:\d+\])/);
+    let contentHtml = '';
+    const parts = blog.content.split(/(\[IMAGE:\d+\])/);
 
-  parts.forEach(part => {
-    const match = part.match(/\[IMAGE:(\d+)\]/);
-    if (match) {
-      const idx = parseInt(match[1]);
-      if (blog.images && blog.images[idx]) {
-        contentHtml += '<img src="' + blog.images[idx] + '" class="blog-inline-img" alt="Image ' + (idx + 1) + '">';
-      }
-    } else if (part.trim()) {
-      const paragraphs = part.split(/\n\s*\n/).filter(p => p.trim());
-      paragraphs.forEach(p => {
-        const parsed = parseMarkdown(p.trim());
-        if (!parsed.startsWith('<h') && !parsed.startsWith('<ul')) {
-          contentHtml += '<p>' + parsed + '</p>';
-        } else {
-          contentHtml += parsed;
+    parts.forEach(part => {
+      const match = part.match(/\[IMAGE:(\d+)\]/);
+      if (match) {
+        const idx = parseInt(match[1]);
+        if (blog.images && blog.images[idx]) {
+          contentHtml += '<img src="' + blog.images[idx] + '" class="blog-inline-img" alt="Image ' + (idx + 1) + '">';
         }
-      });
-    }
-  });
+      } else if (part.trim()) {
+        const paragraphs = part.split(/\n\s*\n/).filter(p => p.trim());
+        paragraphs.forEach(p => {
+          const parsed = parseMarkdown(p.trim());
+          if (!parsed.startsWith('<h') && !parsed.startsWith('<ul')) {
+            contentHtml += '<p>' + parsed + '</p>';
+          } else {
+            contentHtml += parsed;
+          }
+        });
+      }
+    });
 
-  document.getElementById('blogContainer').innerHTML = `
-    <img src="${blog.titleImage || '/logo.png'}" class="blog-title-img" alt="${blog.title}">
-    <h1>${blog.title}</h1>
-    <div class="blog-page-meta">
-      <span>📅 ${blog.date}</span>
-      <span>👤 ${blog.author}</span>
-      <span>👁️ ${blog.views || 0} views</span>
-    </div>
-    <div class="blog-content">${contentHtml}</div>
-  `;
+    document.getElementById('blogContainer').innerHTML = `
+      <img src="${blog.titleImage || '/logo.png'}" class="blog-title-img" alt="${blog.title}">
+      <h1>${blog.title}</h1>
+      <div class="blog-page-meta">
+        <span>📅 ${blog.date}</span>
+        <span>👤 ${blog.author}</span>
+        <span>👁️ ${blog.views || 0} views</span>
+      </div>
+      <div class="blog-content">${contentHtml}</div>
+    `;
 
-  loadReviews();
+    // Show reviews section after blog loads
+    document.getElementById('reviewsSection').style.display = '';
+
+    loadReviews();
+  } catch (err) {
+    document.getElementById('blogContainer').innerHTML = `
+      <div class="blog-loading">
+        <p style="color:#ef4444">❌ Failed to load article. <a href="/" style="color:var(--accent-cyan)">Go back home</a></p>
+      </div>
+    `;
+  }
 }
 
 async function loadReviews() {
-  const res = await fetch('/api/reviews/' + blogId);
-  const reviews = await res.json();
-  const container = document.getElementById('reviewsList');
+  try {
+    const res = await fetch('/api/reviews/' + blogId);
+    const reviews = await res.json();
+    const container = document.getElementById('reviewsList');
 
-  if (reviews.length === 0) {
-    container.innerHTML = `
-      <div class="reviews-empty">
-        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-        <p>No reviews yet. Be the first to review!</p>
+    if (reviews.length === 0) {
+      container.innerHTML = `
+        <div class="reviews-empty">
+          <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+          <p>No reviews yet. Be the first to review!</p>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = reviews.map(r => `
+      <div class="review-card">
+        <div class="review-header">
+          <strong>${r.name}</strong>
+          <span class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
+        </div>
+        <p>${r.comment}</p>
+        <small>${r.date}</small>
       </div>
-    `;
-    return;
+    `).join('');
+  } catch (err) {
+    document.getElementById('reviewsList').innerHTML = '<p style="color:var(--text-muted);text-align:center">Failed to load reviews.</p>';
   }
-
-  container.innerHTML = reviews.map(r => `
-    <div class="review-card">
-      <div class="review-header">
-        <strong>${r.name}</strong>
-        <span class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
-      </div>
-      <p>${r.comment}</p>
-      <small>${r.date}</small>
-    </div>
-  `).join('');
 }
 
 // ===== REVIEW FORM SUBMIT =====
