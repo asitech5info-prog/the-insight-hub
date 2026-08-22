@@ -1,190 +1,209 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Insight Hub</title>
-  <link rel="stylesheet" href="/css/style.css">
-<base target="_blank">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Insight Hub - Explore. Learn. Innovate.</title>
+    <meta name="description" content="Your ultimate destination for technology, education, AI, science, and movie insights.">
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <!-- Navbar -->
-  <nav class="navbar">
+
+<!-- Navbar -->
+<nav class="navbar">
     <a href="/" class="logo-link">
-      <img src="/logo.png" alt="The Insight Hub">
+        <div class="logo-icon">IH</div>
+        <span>The Insight Hub</span>
     </a>
+    <div class="nav-center">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/#categories" class="nav-link">Categories</a>
+        <a href="/#blogs" class="nav-link">Blogs</a>
+        <a href="/contact.html" class="nav-link">Contact</a>
+    </div>
     <div class="nav-right">
-      <div class="search-bar">
-        <input type="text" id="searchInput" placeholder="Search blogs...">
-        <button onclick="doSearch()">🔍</button>
-      </div>
-      <button class="menu-btn" onclick="toggleMenu()">☰</button>
+        <div class="search-bar">
+            <input type="text" id="navSearchInput" placeholder="Search blogs..." onkeypress="if(event.key==='Enter')navSearch()">
+            <button onclick="navSearch()" title="Search">🔍</button>
+        </div>
+        <button class="theme-toggle" id="themeToggle" title="Toggle Theme">🌙</button>
+        <a href="/admin" class="admin-btn-nav">Admin Login</a>
+        <button class="menu-btn" onclick="toggleMenu()" aria-label="Menu">☰</button>
     </div>
-  </nav>
+</nav>
 
-  <!-- Mobile Menu -->
-  <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
-  <div class="mobile-menu" id="mobileMenu">
+<!-- Mobile Menu Overlay -->
+<div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
     <button class="menu-close" onclick="toggleMenu()">✕</button>
-
     <div class="menu-section">
-      <h3>Quick Links</h3>
-      <a href="/" class="menu-item">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-        Home
-      </a>
-      <a href="/search" class="menu-item">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-        Search
-      </a>
-      <a href="/contact" class="menu-item">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-        Contact Us
-      </a>
+        <h3>Navigation</h3>
+        <a href="/" class="menu-item">🏠 Home</a>
+        <a href="/#categories" class="menu-item">📂 Categories</a>
+        <a href="/#blogs" class="menu-item">📝 Blogs</a>
+        <a href="/contact.html" class="menu-item">📧 Contact</a>
+        <a href="/admin" class="menu-item">🔐 Admin</a>
     </div>
-
     <div class="menu-section">
-      <h3>Categories</h3>
-      <a href="/?cat=education" class="menu-item" onclick="filterFromMenu('education'); return false;">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422A12.042 12.042 0 0112 21a12.042 12.042 0 01-6.16-10.422L12 14z"/></svg>
-        Education
-      </a>
-      <a href="/?cat=technology" class="menu-item" onclick="filterFromMenu('technology'); return false;">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-        Technology
-      </a>
-      <a href="/?cat=artificial%20intelligence" class="menu-item" onclick="filterFromMenu('artificial intelligence'); return false;">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-        Artificial Intelligence
-      </a>
-      <a href="/?cat=science" class="menu-item" onclick="filterFromMenu('science'); return false;">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        Science
-      </a>
-      <a href="/?cat=movies" class="menu-item" onclick="filterFromMenu('movies'); return false;">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
-        Movies
-      </a>
+        <h3>Categories</h3>
+        <a href="/?cat=education" class="menu-item">🎓 Education</a>
+        <a href="/?cat=technology" class="menu-item">💻 Technology</a>
+        <a href="/?cat=artificial%20intelligence" class="menu-item">🧠 AI</a>
+        <a href="/?cat=science" class="menu-item">⚛️ Science</a>
+        <a href="/?cat=movies" class="menu-item">🎬 Movies</a>
+        <a href="/?cat=programming" class="menu-item">🖥️ Programming</a>
+        <a href="/?cat=cybersecurity" class="menu-item">🔒 Cybersecurity</a>
+        <a href="/?cat=web%20development" class="menu-item">🌐 Web Dev</a>
     </div>
+</div>
 
-    <div class="menu-section">
-      <h3>Contact Admin</h3>
-      <a href="mailto:asitech5info@gmail.com" class="menu-item">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-        asitech5info@gmail.com
-      </a>
-      <a href="https://youtube.com/@howtech_works?si=gXvodLAXQ36FVHMZ" target="_blank" class="menu-item">
-        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-        HOW TECH WORKS
-      </a>
+<!-- Hero Section -->
+<section class="hero" id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="dot"></span>
+                Welcome to The Insight Hub
+            </div>
+            <h1 class="hero-title">
+                <span class="line">EXPLORE.</span>
+                <span class="line gradient">LEARN.</span>
+                <span class="line">INNOVATE.</span>
+            </h1>
+            <p class="hero-subtitle">Shape the <span class="highlight">Future.</span></p>
+            <p class="hero-desc">
+                Discover the latest technology, artificial intelligence, programming, cybersecurity, 
+                gadgets and innovations shaping our digital world.
+            </p>
+            <div class="hero-buttons">
+                <a href="/#categories" class="btn-primary">Explore Categories →</a>
+                <a href="/#blogs" class="btn-secondary">Latest Articles</a>
+            </div>
+        </div>
+        <div class="hero-visual" id="heroVisual">
+            <div class="orb-container">
+                <div class="orb">IH</div>
+                <div class="orb-ring"></div>
+                <div class="orb-ring"></div>
+                <div class="orb-ring"></div>
+                <div class="orb-particle"></div>
+                <div class="orb-particle"></div>
+                <div class="orb-particle"></div>
+                <div class="orb-particle"></div>
+                <div class="float-badge badge-ai">
+                    <span class="icon">🧠</span>
+                    <span>AI<br><small>Machine Learning</small></span>
+                </div>
+                <div class="float-badge badge-code">
+                    <span class="icon">💻</span>
+                    <span>Code</span>
+                </div>
+                <div class="float-badge badge-future">
+                    <span class="icon">🚀</span>
+                    <span>Future Tech</span>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
+</section>
 
-  <!-- Hero -->
-  <section class="hero">
-    <h1>The Insight Hub</h1>
-    <p>Your ultimate destination for technology, education, AI, science, and movie insights. Stay updated with the latest trends.</p>
-    <div class="hero-socials">
-      <a href="mailto:asitech5info@gmail.com" class="social-icon email">
-        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-      </a>
-      <a href="https://youtube.com/@howtech_works?si=gXvodLAXQ36FVHMZ" target="_blank" class="social-icon youtube">
-        <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-      </a>
+<!-- Stats Section -->
+<section class="stats-section reveal">
+    <div class="stats-container">
+        <div class="stat-item">
+            <div class="stat-number" data-target="120">0</div>
+            <div class="stat-label">Articles</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" data-target="12">0</div>
+            <div class="stat-label">Categories</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" data-target="25000">0</div>
+            <div class="stat-label">Readers</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number" data-target="24">0</div>
+            <div class="stat-label">/7 Updates</div>
+        </div>
     </div>
-  </section>
+</section>
 
-  <!-- Categories -->
-  <section class="categories-section">
-    <h2>Categories</h2>
-    <div class="categories-grid">
-      <div class="cat-card active" onclick="filterCat('all')">
-        <div class="cat-icon">🎓</div>
-        <h4>All</h4>
-      </div>
-      <div class="cat-card" onclick="filterCat('education')">
-        <div class="cat-icon">🎓</div>
-        <h4>Education</h4>
-      </div>
-      <div class="cat-card" onclick="filterCat('technology')">
-        <div class="cat-icon">💻</div>
-        <h4>Technology</h4>
-      </div>
-      <div class="cat-card" onclick="filterCat('artificial intelligence')">
-        <div class="cat-icon">🧠</div>
-        <h4>AI</h4>
-      </div>
-      <div class="cat-card" onclick="filterCat('science')">
-        <div class="cat-icon">⚛️</div>
-        <h4>Science</h4>
-      </div>
-      <div class="cat-card" onclick="filterCat('movies')">
-        <div class="cat-icon">🎬</div>
-        <h4>Movies</h4>
-      </div>
-    </div>
-  </section>
-
-  <!-- Blog Grid -->
-  <section class="blog-section">
+<!-- Categories Section -->
+<section class="categories-section reveal" id="categories">
     <div class="section-header">
-      <h2>Latest Blogs</h2>
+        <h2 class="section-title">Top Categories</h2>
+        <a href="/#blogs" class="section-link">Explore the technology universe →</a>
     </div>
-    <div class="blog-grid" id="blogGrid"></div>
-  </section>
+    <div class="categories-grid" id="categoriesGrid">
+        <!-- Categories injected by JS -->
+    </div>
+</section>
 
-  <!-- Footer -->
-  <footer class="site-footer">
+<!-- Latest Blogs Section -->
+<section class="blog-section reveal" id="blogs">
+    <div class="section-header">
+        <h2 class="section-title">Latest Articles</h2>
+        <a href="/#blogs" class="section-link">Discover what's happening in tech →</a>
+    </div>
+    <div class="blog-grid" id="blogGrid">
+        <div class="blog-loading">
+            <div class="spinner"></div>
+            <p>Loading amazing content...</p>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="site-footer">
     <div class="footer-container">
-      <div class="footer-brand">
-        <div class="footer-brand-header">
-          <svg class="footer-brand-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-          <h3>ASI TECH</h3>
+        <div class="footer-brand">
+            <div class="footer-brand-header">
+                <div class="logo-icon">IH</div>
+                <h3>The Insight Hub</h3>
+            </div>
+            <p>Your ultimate destination for technology, education, AI, science, and movie insights. Stay updated with the latest trends.</p>
+            <div class="footer-socials">
+                <a href="#" class="footer-social" title="YouTube">▶️</a>
+                <a href="#" class="footer-social" title="Twitter">🐦</a>
+                <a href="#" class="footer-social" title="GitHub">🐙</a>
+                <a href="#" class="footer-social" title="Instagram">📷</a>
+            </div>
         </div>
-        <p>Your ultimate destination for technology, education, AI, science, and movie insights. Stay updated with the latest trends.</p>
-        <div class="footer-socials">
-          <a href="mailto:asitech5info@gmail.com" class="footer-social email" aria-label="Email">
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-          </a>
-          <a href="https://youtube.com/@howtech_works?si=gXvodLAXQ36FVHMZ" target="_blank" class="footer-social youtube" aria-label="YouTube">
-            <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-          </a>
+        <div class="footer-col">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="/">🏠 Home</a></li>
+                <li><a href="/#categories">📂 Categories</a></li>
+                <li><a href="/contact.html">📧 Contact</a></li>
+                <li><a href="/admin">🔐 Admin</a></li>
+            </ul>
         </div>
-      </div>
-
-      <div class="footer-col">
-        <h4>Categories</h4>
-        <ul>
-          <li><a href="/?cat=education"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422A12.042 12.042 0 0112 21a12.042 12.042 0 01-6.16-10.422L12 14z"/></svg>Education</a></li>
-          <li><a href="/?cat=technology"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Technology</a></li>
-          <li><a href="/?cat=artificial%20intelligence"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>Artificial Intelligence</a></li>
-          <li><a href="/?cat=science"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Science</a></li>
-          <li><a href="/?cat=movies"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>Movies</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-col">
-        <h4>Quick Links</h4>
-        <ul>
-          <li><a href="/"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Home</a></li>
-          <li><a href="/search"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>Search</a></li>
-          <li><a href="/contact"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>Contact Us</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-col">
-        <h4>Contact Admin</h4>
-        <ul>
-          <li><a href="mailto:asitech5info@gmail.com"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>asitech5info@gmail.com</a></li>
-          <li><a href="https://youtube.com/@howtech_works?si=gXvodLAXQ36FVHMZ" target="_blank"><svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>HOW TECH WORKS</a></li>
-        </ul>
-      </div>
+        <div class="footer-col">
+            <h4>Categories</h4>
+            <ul>
+                <li><a href="/?cat=education">🎓 Education</a></li>
+                <li><a href="/?cat=technology">💻 Technology</a></li>
+                <li><a href="/?cat=artificial%20intelligence">🧠 AI</a></li>
+                <li><a href="/?cat=science">⚛️ Science</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Contact</h4>
+            <ul>
+                <li><a href="mailto:asitech5info@gmail.com">📧 asitech5info@gmail.com</a></li>
+                <li><a href="https://youtube.com/@HOWTECHWORKS" target="_blank">▶️ HOW TECH WORKS</a></li>
+            </ul>
+        </div>
     </div>
     <div class="footer-bottom">
-      <p>© 2024 ASI TECH. All rights reserved. | Built with ❤️ for tech enthusiasts</p>
+        <p>© <span id="year"></span> The Insight Hub. All rights reserved.</p>
     </div>
-  </footer>
+</footer>
 
-  <script src="/js/main.js"></script>
+<script src="/js/main.js"></script>
 </body>
 </html>
