@@ -1,145 +1,127 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Contact - The Insight Hub</title>
-  <link rel="stylesheet" href="/css/style.css">
-<base target="_blank">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - The Insight Hub</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <nav class="navbar">
-    <a href="/" class="logo-link">
-      <img src="/logo.png" alt="The Insight Hub">
-    </a>
-    <div class="nav-right">
-      <div class="search-bar">
-        <input type="text" id="searchInput" placeholder="Search blogs...">
-        <button onclick="doSearch()">🔍</button>
-      </div>
-      <button class="menu-btn" onclick="toggleMenu()">☰</button>
-    </div>
-  </nav>
 
-  <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
-  <div class="mobile-menu" id="mobileMenu">
+<nav class="navbar">
+    <a href="/" class="logo-link">
+        <div class="logo-icon">IH</div>
+        <span>The Insight Hub</span>
+    </a>
+    <div class="nav-center">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/#categories" class="nav-link">Categories</a>
+        <a href="/#blogs" class="nav-link">Blogs</a>
+        <a href="/contact.html" class="nav-link">Contact</a>
+    </div>
+    <div class="nav-right">
+        <button class="theme-toggle" id="themeToggle" title="Toggle Theme">🌙</button>
+        <a href="/admin" class="admin-btn-nav">Admin Login</a>
+        <button class="menu-btn" onclick="toggleMenu()" aria-label="Menu">☰</button>
+    </div>
+</nav>
+
+<div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+<div class="mobile-menu" id="mobileMenu">
     <button class="menu-close" onclick="toggleMenu()">✕</button>
     <div class="menu-section">
-      <h3>Quick Links</h3>
-      <a href="/" class="menu-item">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-        Home
-      </a>
-      <a href="/search" class="menu-item">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-        Search
-      </a>
+        <h3>Navigation</h3>
+        <a href="/" class="menu-item">🏠 Home</a>
+        <a href="/#categories" class="menu-item">📂 Categories</a>
+        <a href="/#blogs" class="menu-item">📝 Blogs</a>
+        <a href="/contact.html" class="menu-item">📧 Contact</a>
     </div>
-  </div>
+</div>
 
-  <div class="contact-page">
-    <h1>Contact Us</h1>
-
-    <div class="contact-card">
-      <div class="contact-item">
-        <svg width="20" height="20" fill="none" stroke="#ef4444" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-        <a href="mailto:asitech5info@gmail.com">asitech5info@gmail.com</a>
-      </div>
-      <div class="contact-item">
-        <svg width="20" height="20" fill="#ff0000" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-        <a href="https://youtube.com/@howtech_works?si=gXvodLAXQ36FVHMZ" target="_blank">HOW TECH WORKS</a>
-      </div>
-    </div>
-
-    <div class="contact-card contact-form">
-      <h3 style="color:var(--accent-cyan);margin-bottom:1.5rem;text-align:center">Send us a Message</h3>
-      <form id="contactForm">
-        <input type="text" name="name" placeholder="Your Name" required>
-        <input type="email" name="email" placeholder="Your Email" required>
-        <input type="text" name="subject" placeholder="Subject" required>
-        <textarea name="message" placeholder="Your Message..." rows="5" required></textarea>
-        <button type="submit">Send Message</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Footer -->
-  <footer class="site-footer">
-    <div class="footer-container">
-      <div class="footer-brand">
-        <div class="footer-brand-header">
-          <svg class="footer-brand-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-          <h3>ASI TECH</h3>
+<main class="contact-page">
+    <h1>Get In Touch</h1>
+    <p>Have a question or want to collaborate? We'd love to hear from you.</p>
+    
+    <div class="contact-grid">
+        <div class="contact-info-card">
+            <div class="icon">📧</div>
+            <h3>Email</h3>
+            <a href="mailto:asitech5info@gmail.com">asitech5info@gmail.com</a>
         </div>
-        <p>Your ultimate destination for technology, education, AI, science, and movie insights. Stay updated with the latest trends.</p>
-        <div class="footer-socials">
-          <a href="mailto:asitech5info@gmail.com" class="footer-social email" aria-label="Email">
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-          </a>
-          <a href="https://youtube.com/@howtech_works?si=gXvodLAXQ36FVHMZ" target="_blank" class="footer-social youtube" aria-label="YouTube">
-            <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-          </a>
+        <div class="contact-info-card">
+            <div class="icon">▶️</div>
+            <h3>YouTube</h3>
+            <a href="https://youtube.com/@HOWTECHWORKS" target="_blank">HOW TECH WORKS</a>
         </div>
-      </div>
-
-      <div class="footer-col">
-        <h4>Categories</h4>
-        <ul>
-          <li><a href="/?cat=education"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422A12.042 12.042 0 0112 21a12.042 12.042 0 01-6.16-10.422L12 14z"/></svg>Education</a></li>
-          <li><a href="/?cat=technology"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>Technology</a></li>
-          <li><a href="/?cat=artificial%20intelligence"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>Artificial Intelligence</a></li>
-          <li><a href="/?cat=science"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Science</a></li>
-          <li><a href="/?cat=movies"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>Movies</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-col">
-        <h4>Quick Links</h4>
-        <ul>
-          <li><a href="/"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Home</a></li>
-          <li><a href="/search"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>Search</a></li>
-          <li><a href="/contact"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>Contact Us</a></li>
-        </ul>
-      </div>
-
-      <div class="footer-col">
-        <h4>Contact Admin</h4>
-        <ul>
-          <li><a href="mailto:asitech5info@gmail.com"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>asitech5info@gmail.com</a></li>
-          <li><a href="https://youtube.com/@howtech_works?si=gXvodLAXQ36FVHMZ" target="_blank"><svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>HOW TECH WORKS</a></li>
-        </ul>
-      </div>
     </div>
-    <div class="footer-bottom">
-      <p>© 2024 ASI TECH. All rights reserved. | Built with ❤️ for tech enthusiasts</p>
+
+    <div class="contact-form-card">
+        <h3>Send a Message</h3>
+        <form id="contactForm">
+            <input type="text" id="contactName" placeholder="Your Name" required maxlength="100">
+            <input type="email" id="contactEmail" placeholder="Your Email" required maxlength="100">
+            <textarea id="contactMessage" placeholder="Your Message" required maxlength="1000" rows="5"></textarea>
+            <button type="submit" id="contactSubmitBtn">Send Message 🚀</button>
+        </form>
     </div>
-  </footer>
+</main>
 
-  <script>
-    function toggleMenu() {
-      document.getElementById('mobileMenu').classList.toggle('open');
-      document.getElementById('menuOverlay').classList.toggle('show');
-    }
-    function doSearch() {
-      const q = document.getElementById('searchInput').value;
-      if (q.trim()) location.href = '/search?q=' + encodeURIComponent(q);
-    }
-    document.getElementById('searchInput')?.addEventListener('keypress', e => { if (e.key === 'Enter') doSearch(); });
+<footer class="site-footer" style="margin-top:3rem;">
+    <div class="footer-bottom" style="border:none; padding:2rem;">
+        <p>© <span id="year"></span> The Insight Hub. All rights reserved.</p>
+    </div>
+</footer>
 
-    document.getElementById('contactForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const formData = new FormData(e.target);
-      const data = Object.fromEntries(formData);
-      const res = await fetch('/api/message', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-      if (res.ok) {
-        alert('Message sent successfully!');
-        e.target.reset();
-      }
+<script>
+(function(){
+    const toggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    const saved = localStorage.getItem('theme') || 'dark';
+    html.setAttribute('data-theme', saved);
+    toggle.textContent = saved === 'dark' ? '🌙' : '☀️';
+    toggle.addEventListener('click', () => {
+        const current = html.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        toggle.textContent = next === 'dark' ? '🌙' : '☀️';
     });
-  </script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+})();
+
+function toggleMenu() {
+    document.getElementById('mobileMenu').classList.toggle('open');
+    document.getElementById('menuOverlay').classList.toggle('show');
+}
+
+document.getElementById('contactForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('contactSubmitBtn');
+    const original = btn.textContent;
+    btn.textContent = 'Sending...';
+    btn.disabled = true;
+    try {
+        const res = await fetch('/api/contact', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({
+                name: document.getElementById('contactName').value.trim(),
+                email: document.getElementById('contactEmail').value.trim(),
+                message: document.getElementById('contactMessage').value.trim()
+            })
+        });
+        if(res.ok) {
+            alert('Message sent successfully! We will get back to you soon.');
+            this.reset();
+        } else {
+            alert('Failed to send message. Please try again.');
+        }
+    } catch(err) {
+        alert('Network error. Please try again.');
+    }
+    btn.textContent = original;
+    btn.disabled = false;
+});
+</script>
 </body>
 </html>
