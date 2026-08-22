@@ -1,190 +1,149 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Dashboard - The Insight Hub</title>
-  <link rel="stylesheet" href="/css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - The Insight Hub</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body class="admin-page">
 
-  <!-- LOGIN SCREEN -->
-  <div class="admin-login" id="loginBox">
-    <h2>🔒 Admin Login</h2>
-    <p>Enter your password to access the dashboard</p>
-    <input type="password" id="adminPass" placeholder="Password">
-    <button onclick="login()">Login</button>
-    <p class="login-error" id="loginError"></p>
-  </div>
+<nav class="navbar">
+    <a href="/" class="logo-link">
+        <div class="logo-icon">IH</div>
+        <span>The Insight Hub</span>
+    </a>
+    <div class="nav-center">
+        <a href="/" class="nav-link">Home</a>
+        <a href="/contact.html" class="nav-link">Contact</a>
+    </div>
+    <div class="nav-right">
+        <button class="theme-toggle" id="themeToggle" title="Toggle Theme">🌙</button>
+    </div>
+</nav>
 
-  <!-- ADMIN PANEL -->
-  <div class="admin-panel hidden" id="adminBox">
+<!-- Login -->
+<div id="adminLogin" class="admin-login">
+    <h2>🔐 Admin Login</h2>
+    <p>Enter password to access admin panel</p>
+    <input type="password" id="adminPassword" placeholder="Password">
+    <button onclick="adminLogin()">Login</button>
+    <p id="loginError" class="login-error hidden">Invalid password</p>
+</div>
 
-    <!-- Header -->
+<!-- Panel -->
+<div id="adminPanel" class="admin-panel hidden">
     <div class="admin-header">
-      <h1>📊 Admin Dashboard</h1>
-      <div class="admin-actions">
-        <button class="admin-btn primary" onclick="showTab('create')">
-          <span>+</span> New Blog
-        </button>
-        <button class="admin-btn secondary" onclick="showTab('messages')">
-          <span>✉</span> Messages
-        </button>
-        <button class="admin-btn danger" onclick="logout()">
-          <span>→</span> Logout
-        </button>
-      </div>
+        <h1>📊 Admin Dashboard</h1>
+        <div class="admin-actions">
+            <button class="admin-btn primary" onclick="showCreateForm()">➕ New Blog</button>
+            <button class="admin-btn secondary" onclick="adminLogout()">🚪 Logout</button>
+        </div>
     </div>
 
-    <!-- Stats Cards -->
     <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon blue">📰</div>
-        <div class="stat-info">
-          <h3 id="statBlogs">0</h3>
-          <p>Total Blogs</p>
+        <div class="stat-card">
+            <div class="stat-icon blue">📝</div>
+            <div class="stat-info">
+                <h3 id="statBlogs">0</h3>
+                <p>Total Blogs</p>
+            </div>
         </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon green">💬</div>
-        <div class="stat-info">
-          <h3 id="statReviews">0</h3>
-          <p>Total Reviews</p>
+        <div class="stat-card">
+            <div class="stat-icon green">💬</div>
+            <div class="stat-info">
+                <h3 id="statReviews">0</h3>
+                <p>Total Reviews</p>
+            </div>
         </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon orange">✉</div>
-        <div class="stat-info">
-          <h3 id="statMessages">0</h3>
-          <p>Total Messages</p>
+        <div class="stat-card">
+            <div class="stat-icon orange">📧</div>
+            <div class="stat-info">
+                <h3 id="statMessages">0</h3>
+                <p>Messages</p>
+            </div>
         </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon purple">🔔</div>
-        <div class="stat-info">
-          <h3 id="statUnread">0</h3>
-          <p>Unread Messages</p>
+        <div class="stat-card">
+            <div class="stat-icon purple">👁️</div>
+            <div class="stat-info">
+                <h3 id="statViews">0</h3>
+                <p>Total Views</p>
+            </div>
         </div>
-      </div>
     </div>
 
-    <!-- Tabs -->
     <div class="tabs">
-      <button class="tab-btn active" onclick="showTab('blogs')" id="tab-blogs">📰 All Blogs</button>
-      <button class="tab-btn" onclick="showTab('create')" id="tab-create">✏️ Create Blog</button>
-      <button class="tab-btn" onclick="showTab('reviews')" id="tab-reviews">💬 Reviews</button>
-      <button class="tab-btn" onclick="showTab('messages')" id="tab-messages">✉ Messages</button>
+        <button class="tab-btn active" onclick="switchTab('blogs')">📝 Blogs</button>
+        <button class="tab-btn" onclick="switchTab('reviews')">💬 Reviews</button>
+        <button class="tab-btn" onclick="switchTab('messages')">📧 Messages</button>
+        <button class="tab-btn" onclick="switchTab('create')">➕ Create Blog</button>
     </div>
 
-    <!-- TAB: All Blogs -->
-    <div class="tab-content active" id="content-blogs">
-      <div class="admin-section">
-        <h2>📰 All Blogs</h2>
-        <div id="blogsTableContainer">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Category</th>
-                <th>Views</th>
-                <th>Date</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="blogsTableBody"></tbody>
-          </table>
+    <div id="tab-blogs" class="tab-content active">
+        <div class="admin-section">
+            <h2>All Blogs</h2>
+            <table class="data-table">
+                <thead>
+                    <tr><th>Title</th><th>Category</th><th>Date</th><th>Views</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="blogsTable"></tbody>
+            </table>
         </div>
-      </div>
     </div>
 
-    <!-- TAB: Create Blog -->
-    <div class="tab-content" id="content-create">
-      <div class="admin-section">
-        <h2>✏️ Create New Blog</h2>
-        <form class="blog-form" id="blogForm" enctype="multipart/form-data">
-          <input type="text" name="title" placeholder="Blog Title" required>
-
-          <select name="category" required>
-            <option value="">Select Category</option>
-            <option value="education">Education</option>
-            <option value="technology">Technology</option>
-            <option value="artificial intelligence">Artificial Intelligence</option>
-            <option value="science">Science</option>
-            <option value="movies">Movies</option>
-          </select>
-
-          <p class="file-hint">📷 Title Image (shown at top of blog):</p>
-          <input type="file" name="titleImage" accept="image/*" required>
-
-          <p class="file-hint">📝 Content: Type paragraphs. Insert images with <strong>[IMAGE:0]</strong>, <strong>[IMAGE:1]</strong>, etc.</p>
-          <textarea name="content" placeholder="Write your blog here...
-
-Example:
-This is paragraph one.
-
-[IMAGE:0]
-
-This is paragraph two with more text.
-
-[IMAGE:1]
-
-This is the final paragraph." required></textarea>
-
-          <p class="file-hint">📸 Upload Content Images (up to 5). [IMAGE:0] = first image:</p>
-          <input type="file" name="images" accept="image/*" multiple>
-
-          <button type="submit" class="admin-btn primary" style="width:auto">🚀 Publish Blog</button>
-        </form>
-      </div>
-    </div>
-
-    <!-- TAB: Reviews -->
-    <div class="tab-content" id="content-reviews">
-      <div class="admin-section">
-        <h2>💬 All Reviews</h2>
-        <div id="reviewsTableContainer">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Blog</th>
-                <th>Rating</th>
-                <th>Comment</th>
-                <th>Date</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="reviewsTableBody"></tbody>
-          </table>
+    <div id="tab-reviews" class="tab-content">
+        <div class="admin-section">
+            <h2>All Reviews</h2>
+            <table class="data-table">
+                <thead>
+                    <tr><th>Blog</th><th>Name</th><th>Rating</th><th>Comment</th><th>Date</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="reviewsTable"></tbody>
+            </table>
         </div>
-      </div>
     </div>
 
-    <!-- TAB: Messages -->
-    <div class="tab-content" id="content-messages">
-      <div class="admin-section">
-        <h2>✉ All Messages</h2>
-        <div id="messagesTableContainer">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Subject</th>
-                <th>Message</th>
-                <th>Date</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="messagesTableBody"></tbody>
-          </table>
+    <div id="tab-messages" class="tab-content">
+        <div class="admin-section">
+            <h2>Contact Messages</h2>
+            <table class="data-table">
+                <thead>
+                    <tr><th>Name</th><th>Email</th><th>Message</th><th>Date</th><th>Status</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="messagesTable"></tbody>
+            </table>
         </div>
-      </div>
     </div>
 
-  </div>
+    <div id="tab-create" class="tab-content">
+        <div class="admin-section">
+            <h2>Create New Blog</h2>
+            <form id="createBlogForm" class="blog-form" onsubmit="createBlog(event)">
+                <input type="text" id="blogTitle" placeholder="Blog Title" required>
+                <input type="text" id="blogAuthor" placeholder="Author Name" value="Admin">
+                <select id="blogCategory" required>
+                    <option value="education">Education</option>
+                    <option value="technology">Technology</option>
+                    <option value="artificial intelligence">Artificial Intelligence</option>
+                    <option value="science">Science</option>
+                    <option value="movies">Movies</option>
+                    <option value="programming">Programming</option>
+                    <option value="cybersecurity">Cybersecurity</option>
+                    <option value="web development">Web Development</option>
+                    <option value="gadgets & reviews">Gadgets & Reviews</option>
+                    <option value="tech news">Tech News</option>
+                </select>
+                <p class="file-hint">Title Image (optional):</p>
+                <input type="file" id="titleImage" accept="image/*">
+                <textarea id="blogContent" placeholder="Blog Content (use # for headings, ** for bold, - for lists)" required></textarea>
+                <p class="file-hint">Additional Images (optional, will be inserted as [IMAGE:0], [IMAGE:1], etc.):</p>
+                <input type="file" id="blogImages" accept="image/*" multiple>
+                <button type="submit" class="admin-btn primary">🚀 Publish Blog</button>
+            </form>
+        </div>
+    </div>
+</div>
 
-  <script src="/js/admin.js"></script>
+<script src="/js/admin.js"></script>
 </body>
 </html>
