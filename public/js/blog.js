@@ -1,262 +1,234 @@
-const params = new URLSearchParams(location.search);
-const blogId = params.get('id');
+/* ============================================
+   THE INSIGHT HUB - Blog Page JavaScript
+   ============================================ */
+
+// ===== THEME =====
+(function initTheme() {
+    const toggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    const saved = localStorage.getItem('theme') || 'dark';
+    html.setAttribute('data-theme', saved);
+    if(toggle) toggle.textContent = saved === 'dark' ? '🌙' : '☀️';
+    if(toggle) {
+        toggle.addEventListener('click', () => {
+            const current = html.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', next);
+            localStorage.setItem('theme', next);
+            toggle.textContent = next === 'dark' ? '🌙' : '☀️';
+        });
+    }
+    document.getElementById('year').textContent = new Date().getFullYear();
+})();
 
 function toggleMenu() {
-  document.getElementById('mobileMenu').classList.toggle('open');
-  document.getElementById('menuOverlay').classList.toggle('show');
+    document.getElementById('mobileMenu').classList.toggle('open');
+    document.getElementById('menuOverlay').classList.toggle('show');
 }
 
-function doSearch() {
-  const q = document.getElementById('searchInput').value;
-  if (q.trim()) location.href = '/search?q=' + encodeURIComponent(q);
+function getBlogId() {
+    return new URLSearchParams(window.location.search).get('id');
 }
-document.getElementById('searchInput')?.addEventListener('keypress', e => { if (e.key === 'Enter') doSearch(); });
 
-// ===== SHARE FUNCTIONS =====
-function getShareUrl() {
-  return encodeURIComponent(window.location.href);
+function parseMarkdown(text) {
+    if(!text) return '';
+    let html = text
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+        .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
+        .replace(/\*(.*)\*/gim, '<em>$1</em>')
+        .replace(/^\- (.*$)/gim, '<li>$1</li>')
+        .replace(/^\* (.*$)/gim, '<li>$1</li>');
+    
+    html = html.replace(/(<li>.*<\/li>)\n(?!<li>)/g, '<ul>$1</ul>\n');
+    html = html.replace(/(<li>.*<\/li>)\n(?=<li>)/g, '$1\n');
+    html = html.replace(/(<li>.*<\/li>\n)+/g, match => {
+        if(!match.startsWith('<ul>')) return '<ul>' + match + '</ul>';
+        return match;
+    });
+    
+    html = html.replace(/\n/g, '<br>');
+    return html;
 }
-function getShareTitle() {
-  return encodeURIComponent(document.title);
+
+async function loadBlog() {
+    const id = getBlogId();
+    if(!id) {
+        document.getElementById('blogLoading').classList.add('hidden');
+        document.getElementById('blogError').classList.remove('hidden');
+        return;
+    }
+    
+    try {
+        const res = await fetch('/api/blogs');
+        const blogs = await res.json();
+        const blog = blogs.find(b => b.id === id);
+        
+        if(!blog) throw new Error('Not found');
+        
+        document.getElementById('blogTitle').textContent = blog.title || 'Untitled';
+        document.getElementById('blogAuthor').textContent = blog.author || 'Admin';
+        document.getElementById('blogDate').textContent = blog.date || '';
+        document.getElementById('blogViews').textContent = blog.views || 0;
+        document.getElementById('blogCategory').innerHTML = `<span class="blog-card-tag">${blog.category || 'General'}</span>`;
+        
+        const img = document.getElementById('blogTitleImg');
+        img.src = blog.titleImage || '/logo.png';
+        img.onerror = () => { img.src = '/logo.png'; };
+        
+        let content = blog.content || '';
+        if(blog.images && blog.images.length > 0) {
+            blog.images.forEach((imgData, idx) => {
+                content = content.replace(`[IMAGE:${idx}]`, `<img src="${imgData}" class="blog-inline-img" alt="Blog image ${idx+1}" onerror="this.style.display='none'">`);
+            });
+        }
+        document.getElementById('blogBody').innerHTML = parseMarkdown(content);
+        
+        document.getElementById('blogLoading').classList.add('hidden');
+        document.getElementById('blogContent').classList.remove('hidden');
+        
+        loadReviews(id);
+        
+    } catch(e) {
+        document.getElementById('blogLoading').classList.add('hidden');
+        document.getElementById('blogError').classList.remove('hidden');
+    }
 }
-function shareTwitter() {
-  window.open('https://twitter.com/intent/tweet?url=' + getShareUrl() + '&text=' + getShareTitle(), '_blank', 'width=600,height=400');
+
+// ===== REVIEWS =====
+async function loadReviews(blogId) {
+    try {
+        const res = await fetch('/api/reviews/' + blogId);
+        const reviews = await res.json();
+        const container = document.getElementById('reviewsList');
+        
+        if(reviews.length === 0) {
+            container.innerHTML = `<div class="reviews-empty"><p>💬 No reviews yet. Be the first!</p></div>`;
+            return;
+        }
+        
+        container.innerHTML = reviews.map(r => `
+            <div class="review-card">
+                <div class="review-header">
+                    <strong>${escapeHtml(r.name)}</strong>
+                    <span class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</span>
+                </div>
+                <p>${escapeHtml(r.comment)}</p>
+                <small>${new Date(r.date).toLocaleDateString()}</small>
+            </div>
+        `).join('');
+    } catch(e) {
+        console.error('Failed to load reviews', e);
+    }
 }
-function shareFacebook() {
-  window.open('https://www.facebook.com/sharer/sharer.php?u=' + getShareUrl(), '_blank', 'width=600,height=400');
-}
-function shareWhatsApp() {
-  window.open('https://wa.me/?text=' + getShareTitle() + '%20' + getShareUrl(), '_blank');
-}
-function copyLink() {
-  navigator.clipboard.writeText(window.location.href).then(() => {
-    const btn = document.querySelector('.share-btn.copylink');
-    const original = btn.innerHTML;
-    btn.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>';
-    setTimeout(() => { btn.innerHTML = original; }, 1500);
-  });
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 // ===== STAR RATING =====
 let selectedRating = 0;
-function initStarRating() {
-  const stars = document.querySelectorAll('#starRating .star');
-  const ratingInput = document.getElementById('revRating');
-
-  stars.forEach(star => {
-    star.addEventListener('click', () => {
-      selectedRating = parseInt(star.dataset.value);
-      ratingInput.value = selectedRating;
-      updateStars();
-    });
-    star.addEventListener('mouseenter', () => {
-      const val = parseInt(star.dataset.value);
-      stars.forEach((s, i) => {
-        s.classList.toggle('active', i < val);
-      });
-    });
-  });
-
-  document.getElementById('starRating').addEventListener('mouseleave', updateStars);
-}
-
-function updateStars() {
-  const stars = document.querySelectorAll('#starRating .star');
-  stars.forEach((s, i) => {
-    s.classList.toggle('active', i < selectedRating);
-  });
-}
-
-// ===== CHARACTER COUNTER =====
-function initCharCounter() {
-  const textarea = document.getElementById('revComment');
-  const counter = document.getElementById('charCounter');
-  textarea.addEventListener('input', () => {
-    counter.textContent = textarea.value.length + ' / 1000 characters';
-    if (textarea.value.length >= 1000) {
-      counter.style.color = '#ef4444';
-    } else {
-      counter.style.color = 'var(--text-muted)';
-    }
-  });
-}
-
-// ===== MARKDOWN PARSER =====
-// Supports: # Heading, ## Sub Heading, **bold**, *italic*, - bullet, * bullet, 1. numbered
-function parseMarkdown(text) {
-  // Escape HTML first
-  let html = text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-
-  // Headings (must be at start of line)
-  html = html.replace(/^# (.+)$/gm, '<h2 style="color:#ddd6fe;font-size:1.8rem;margin:2rem 0 1rem;font-weight:700;">$1</h2>');
-  html = html.replace(/^## (.+)$/gm, '<h3 style="color:#a78bfa;font-size:1.4rem;margin:1.5rem 0 1rem;">$1</h3>');
-
-  // Bold **text**
-  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-
-  // Italic *text* (but not bullet points)
-  // We handle this carefully - only match *text* that is NOT at start of line followed by space
-  html = html.replace(/(?<!^\s*)\*(?!\s)(.+?)(?<!\s)\*(?!\s)/g, '<em>$1</em>');
-
-  // Bullet points: - item  or  * item
-  html = html.replace(/^- (.+)$/gm, '<li style="margin-bottom:0.5rem;color:#d1d5db;">$1</li>');
-  html = html.replace(/^\* (.+)$/gm, '<li style="margin-bottom:0.5rem;color:#d1d5db;">$1</li>');
-
-  // Numbered lists
-  html = html.replace(/^\d+\. (.+)$/gm, '<li style="margin-bottom:0.5rem;color:#d1d5db;">$1</li>');
-
-  // Wrap consecutive li elements in ul
-  html = html.replace(/(<li[^>]*>.*?<\/li>\n?)+/gs, function(match) {
-    return '<ul style="margin:1rem 0 1rem 1.5rem;list-style-type:disc;">' + match.replace(/\n/g, '') + '</ul>';
-  });
-
-  // Line breaks for remaining text
-  html = html.replace(/\n/g, '<br>');
-
-  return html;
-}
-
-async function loadBlog() {
-  if (!blogId) return location.href = '/';
-
-  // Track view (fire and forget)
-  fetch('/api/blog/view/' + blogId, { method: 'POST' }).catch(()=>{});
-
-  try {
-    const res = await fetch('/api/blog/' + blogId);
-    if (!res.ok) return location.href = '/';
-
-    const blog = await res.json();
-
-    let contentHtml = '';
-    const parts = blog.content.split(/(\[IMAGE:\d+\])/);
-
-    parts.forEach(part => {
-      const match = part.match(/\[IMAGE:(\d+)\]/);
-      if (match) {
-        const idx = parseInt(match[1]);
-        if (blog.images && blog.images[idx]) {
-          contentHtml += '<img src="' + blog.images[idx] + '" class="blog-inline-img" alt="Image ' + (idx + 1) + '">';
-        }
-      } else if (part.trim()) {
-        const paragraphs = part.split(/\n\s*\n/).filter(p => p.trim());
-        paragraphs.forEach(p => {
-          const parsed = parseMarkdown(p.trim());
-          if (!parsed.startsWith('<h') && !parsed.startsWith('<ul')) {
-            contentHtml += '<p>' + parsed + '</p>';
-          } else {
-            contentHtml += parsed;
-          }
+(function initStars() {
+    const stars = document.querySelectorAll('#starRating .star');
+    stars.forEach(star => {
+        star.addEventListener('click', () => {
+            selectedRating = parseInt(star.dataset.value);
+            stars.forEach((s, i) => {
+                s.classList.toggle('active', i < selectedRating);
+            });
         });
-      }
+        star.addEventListener('mouseenter', () => {
+            const val = parseInt(star.dataset.value);
+            stars.forEach((s, i) => {
+                s.style.color = i < val ? '#fbbf24' : '';
+            });
+        });
     });
-
-    document.getElementById('blogContainer').innerHTML = `
-      <img src="${blog.titleImage || '/logo.png'}" class="blog-title-img" alt="${blog.title}">
-      <h1>${blog.title}</h1>
-      <div class="blog-page-meta">
-        <span>📅 ${blog.date}</span>
-        <span>👤 ${blog.author}</span>
-        <span>👁️ ${blog.views || 0} views</span>
-      </div>
-      <div class="blog-content">${contentHtml}</div>
-    `;
-
-    // Show reviews section after blog loads
-    document.getElementById('reviewsSection').style.display = '';
-
-    loadReviews();
-  } catch (err) {
-    document.getElementById('blogContainer').innerHTML = `
-      <div class="blog-loading">
-        <p style="color:#ef4444">❌ Failed to load article. <a href="/" style="color:var(--accent-cyan)">Go back home</a></p>
-      </div>
-    `;
-  }
-}
-
-async function loadReviews() {
-  try {
-    const res = await fetch('/api/reviews/' + blogId);
-    const reviews = await res.json();
-    const container = document.getElementById('reviewsList');
-
-    if (reviews.length === 0) {
-      container.innerHTML = `
-        <div class="reviews-empty">
-          <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-          <p>No reviews yet. Be the first to review!</p>
-        </div>
-      `;
-      return;
-    }
-
-    container.innerHTML = reviews.map(r => `
-      <div class="review-card">
-        <div class="review-header">
-          <strong>${r.name}</strong>
-          <span class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
-        </div>
-        <p>${r.comment}</p>
-        <small>${r.date}</small>
-      </div>
-    `).join('');
-  } catch (err) {
-    document.getElementById('reviewsList').innerHTML = '<p style="color:var(--text-muted);text-align:center">Failed to load reviews.</p>';
-  }
-}
-
-// ===== REVIEW FORM SUBMIT =====
-document.getElementById('reviewForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  const rating = parseInt(document.getElementById('revRating').value);
-  if (rating < 1 || rating > 5) {
-    alert('Please select a star rating');
-    return;
-  }
-
-  const review = {
-    blogId,
-    name: document.getElementById('revName').value.trim(),
-    email: document.getElementById('revEmail').value.trim(),
-    rating: rating,
-    comment: document.getElementById('revComment').value.trim()
-  };
-
-  const btn = e.target.querySelector('.post-review-btn');
-  const originalText = btn.innerHTML;
-  btn.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Posting...';
-  btn.disabled = true;
-
-  try {
-    const res = await fetch('/api/review', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(review)
+    document.getElementById('starRating').addEventListener('mouseleave', () => {
+        stars.forEach((s, i) => {
+            s.style.color = i < selectedRating ? '#fbbf24' : '';
+        });
     });
+})();
 
-    if (res.ok) {
-      document.getElementById('reviewForm').reset();
-      selectedRating = 0;
-      updateStars();
-      document.getElementById('charCounter').textContent = '0 / 1000 characters';
-      loadReviews();
-    } else {
-      alert('Failed to post review. Please try again.');
-    }
-  } catch (err) {
-    alert('Network error. Please try again.');
-  } finally {
-    btn.innerHTML = originalText;
-    btn.disabled = false;
-  }
+// ===== CHAR COUNTER =====
+document.getElementById('reviewText').addEventListener('input', function() {
+    document.getElementById('charCounter').textContent = `${this.value.length} / 500`;
 });
 
-// Init
-initStarRating();
-initCharCounter();
+// ===== SUBMIT REVIEW =====
+document.getElementById('reviewForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const blogId = getBlogId();
+    if(!blogId) return;
+    
+    if(selectedRating === 0) {
+        alert('Please select a star rating!');
+        return;
+    }
+    
+    const btn = this.querySelector('.post-review-btn');
+    const original = btn.textContent;
+    btn.textContent = 'Posting...';
+    btn.disabled = true;
+    
+    try {
+        const res = await fetch('/api/reviews/' + blogId, {
+            method: 'POST',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({
+                name: document.getElementById('reviewerName').value.trim(),
+                email: document.getElementById('reviewerEmail').value.trim(),
+                rating: selectedRating,
+                comment: document.getElementById('reviewText').value.trim()
+            })
+        });
+        
+        if(res.ok) {
+            alert('Review posted successfully!');
+            this.reset();
+            selectedRating = 0;
+            document.querySelectorAll('#starRating .star').forEach(s => {
+                s.classList.remove('active');
+                s.style.color = '';
+            });
+            document.getElementById('charCounter').textContent = '0 / 500';
+            loadReviews(blogId);
+        } else {
+            alert('Failed to post review.');
+        }
+    } catch(err) {
+        alert('Network error. Please try again.');
+    }
+    
+    btn.textContent = original;
+    btn.disabled = false;
+});
+
+// ===== SHARE =====
+function shareBlog(platform) {
+    const url = window.location.href;
+    const title = document.getElementById('blogTitle').textContent;
+    const text = `Check out this blog: ${title}`;
+    
+    switch(platform) {
+        case 'twitter':
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+            break;
+        case 'facebook':
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+            break;
+        case 'whatsapp':
+            window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`, '_blank');
+            break;
+        case 'copy':
+            navigator.clipboard.writeText(url).then(() => alert('Link copied to clipboard!'));
+            break;
+    }
+}
+
 loadBlog();
